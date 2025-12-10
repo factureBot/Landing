@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FactureBot | Automated Invoice Reminders for Freelancers</title>
+
+  <!-- ✅ Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-4TC89GKQ0T"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-4TC89GKQ0T', { 'anonymize_ip': true });
+</script>
+
+  <!-- Favicon -->
+  <link rel="icon" href="https://i.ibb.co/CKtf1C4Q/logo.png">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Google Font -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    /* ===== GLOBAL STYLES ===== */
+    :root{
+      --primary: #000000;       /* Noir pour les titres comme la maquette */
+      --accent: #10B981;        /* Vert pour les accents */
+      --bg: #FFFFFF;            /* Fond blanc global */
+      --card: #F8FAFC;          /* Fond gris clair pour les cartes */
+      --muted: #64748B;         /* Texte secondaire */
+      --dark: #0F172A;          /* Texte principal foncé */
+      --glass: rgba(0,0,0,0.05);
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{height:100%}
+    body{
+      font-family:"Inter",system-ui,-apple-system,Segoe UI,Helvetica,Arial;
+      color:var(--dark);
+      background:var(--bg);
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      line-height:1.5;
+    }
+    .container{max-width:1200px;margin:0 auto;padding:0 20px}
+
+    /* ===== HEADER ===== */
+    header{position:fixed;top:0;left:0;right:0;background:#fff;padding:14px 0;box-shadow:0 6px 18px rgba(15,23,42,0.06);z-index:1000}
+    .header-content{display:flex;align-items:center;justify-content:space-between;gap:24px}
+    .logo{display:flex;align-items:center;gap:12px;text-decoration:none}
+    .logo-img{height:42px;width:auto}
+    .logo-text{font-weight:800;font-size:20px;color: var(--primary);} /* Logo text in black */
+
+    /* ===== NAVIGATION - CORRECTIONS MOBILE ===== */
+    nav {
+      display: none;
+      position: fixed;
+      top: 70px; /* Position sous le header */
+      left: 0;
+      width: 100%;
+      background: white;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      z-index: 999;
+      border-top: 1px solid #e2e8f0;
+    }
+
+    nav.show {
+      display: block;
+    }
+
+    .nav-links {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      list-style: none;
+    }
+
+    .nav-links li {
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .nav-links li:last-child {
+      border-bottom: none;
+      margin-top: 10px;
+    }
+
+    .nav-links a {
+      display: block;
+      padding: 16px 20px;
+      color: var(--dark);
+      text-decoration: none;
+      font-weight: 500;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      background: #f8fafc;
+      color: var(--primary);
+      padding-left: 25px;
+    }
+
+    .nav-links li:last-child a.cta-large {
+      background: linear-gradient(90deg, var(--primary), #333);
+      color: white;
+      text-align: center;
+      padding: 14px 20px;
+      margin-top: 10px;
+    }
+
+    .nav-links li:last-child a.cta-large:hover {
+      background: linear-gradient(90deg, #333, #000);
+      padding-left: 20px;
+    }
+
+    .mobile-menu-btn {
+      background: none;
+      border: none;
+      font-size: 22px;
+      color: var(--dark);
+      cursor: pointer;
+      display: none; /* Caché par défaut sur desktop */
+    }
+
+    /* Desktop navigation */
+    @media (min-width: 769px) {
+      nav {
+        display: block !important;
+        position: static;
+        background: transparent;
+        padding: 0;
+        box-shadow: none;
+        border-top: none;
+        width: auto;
+      }
+      
+      .nav-links {
+        flex-direction: row;
+        gap: 28px;
+      }
+      
+      .nav-links li {
+        border-bottom: none;
+      }
+      
+      .nav-links a {
+        padding: 0;
+      }
+      
+      .nav-links a:hover {
+        background: transparent;
+        padding-left: 0;
+      }
+      
+      .nav-links li:last-child a.cta-large {
+        background: linear-gradient(90deg, var(--primary), #3B82F6);
+        padding: 10px 18px;
+        margin-top: 0;
+      }
+      
+      .mobile-menu-btn {
+        display: none !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .mobile-menu-btn {
+        display: block;
+      }
+    }
+
+    /* ===== HERO SECTION (Modifiée pour correspondre à la maquette) ===== */
+    .hero {
+      padding: 150px 0 80px; /* Adjusted padding */
+      position: relative;
+      background: var(--bg);
+      text-align: left; /* Align text to the left */
+    }
+    .hero::before {
+      display: none; /* Remove background image */
+    }
+    .hero-bg-overlay {
+      display: none; /* Remove overlay */
+    }
+    .hero-content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      display: grid;
+      grid-template-columns: 1fr 1fr; /* Text on left, CTA on right */
+      gap: 40px;
+      align-items: center;
+    }
+    .hero h1 {
+      font-size: 3rem;
+      line-height: 1.1;
+      margin-bottom: 1rem;
+      color: var(--primary);
+    }
+    .hero-subtitle {
+      font-size: 1.2rem;
+      color: var(--muted);
+      margin-bottom: 2rem;
+      max-width: 90%;
+    }
+    .cta-large{
+      display:inline-flex;align-items:center;gap:12px;padding:16px 32px;border-radius:12px;
+      background:linear-gradient(90deg,var(--primary),#333);color:white;text-decoration:none;font-weight:700;
+      box-shadow:0 10px 30px rgba(0,0,0,0.18);transition:transform .18s ease, box-shadow .18s ease;
+      justify-self: start; /* Align button to the left in its column */
+    }
+    .cta-large:hover{transform:translateY(-4px);box-shadow:0 18px 40px rgba(0,0,0,0.22)}
+
+    /* ===== SOCIAL PROOF (Modifiée pour correspondre à la maquette) ===== */
+    .social-proof{
+      padding: 30px 0;
+      background: var(--bg);
+      border-top: 1px solid #e2e8f0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .platform-logos{
+      display:flex;
+      justify-content: space-around; /* Even space between logos */
+      align-items:center;
+      flex-wrap:wrap;
+      gap:20px;
+    }
+    .platform-logo{
+      background: transparent !important; /* Transparent background */
+      padding:5px 15px;
+      color:var(--muted);
+      font-weight:600;
+      border-radius:6px;
+      border: 1px solid #e2e8f0; /* Light border */
+    }
+
+    /* ===== PROBLEM SECTION (Modifiée pour correspondre à la maquette) ===== */
+    .problem{padding:70px 0;text-align:center}
+    .section-title{font-size:clamp(1.6rem,3.5vw,2.4rem);font-weight:800;color:var(--primary);margin-bottom:10px} /* Title in black */
+    .problem-text{color:var(--muted);max-width:880px;margin:0 auto 26px;font-size:1.05rem}
+
+    .problem-stats{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr); /* 3 equal columns */
+      gap:20px;
+      max-width:1000px;
+      margin:40px auto;
+    }
+    .stat-card{
+      background:var(--card); /* Light grey background */
+      padding:25px;
+      text-align:center;
+      border-radius:14px;
+      border: 1px solid #e2e8f0;
+      box-shadow:0 8px 24px rgba(15,23,42,0.04);
+      transition:transform .18s ease
+    }
+    .stat-card:hover{transform:translateY(-6px)}
+    .stat-icon{font-size: 2.5rem; color:var(--accent); margin-bottom:15px;} /* Icons in green */
+    .stat-number{font-weight:700;font-size:1.6rem;color:var(--dark);margin-bottom:6px}
+    .stat-desc{color:var(--muted)}
+
+    /* ===== SOLUTION SECTION (Modifiée pour correspondre à la maquette) ===== */
+    .solution{padding:80px 0;background:transparent}
+    .solution-grid{
+      display:grid;
+      grid-template-columns: repeat(4, 1fr); /* 4 cards side by side */
+      gap:20px;
+      margin-top:40px;
+    }
+    .feature-card{
+      background:var(--card); /* Light grey background */
+      padding:25px;
+      border-radius:14px;
+      border: 1px solid #e2e8f0;
+      box-shadow:0 10px 30px rgba(2,6,23,0.03);
+      text-align:center;
+      transition:transform .18s ease
+    }
+    .feature-card:hover{transform:translateY(-8px)}
+    .feature-icon{
+      width:60px;height:60px;border-radius:50%; /* Circular icon */
+      display:inline-flex;align-items:center;justify-content:center;
+      background:var(--accent); /* Green circle */
+      color:white;
+      font-size:1.5rem;
+      margin-bottom:15px;
+    }
+
+    /* ===== GUIDE OFFER (Modifiée pour correspondre à la maquette) ===== */
+    .guide-offer{
+      padding:80px 0;
+      background: linear-gradient(135deg, var(--primary), #1a1a1a); /* Black gradient */
+      color:white;
+      text-align:center;
+    }
+    .guide-content{
+      max-width:600px; /* Narrower for better focus */
+      margin:0 auto;
+    }
+    .guide-badge{
+      display:inline-block;
+      background:rgba(255,255,255,0.15);
+      padding:8px 20px;
+      border-radius:999px;
+      font-weight:700;
+      margin-bottom:15px;
+      color: white;
+    }
+    .guide-form{
+      background:var(--card);
+      padding:30px;
+      border-radius:16px;
+      margin-top:30px;
+      color:var(--dark);
+      box-shadow:0 20px 40px rgba(0,0,0,0.15);
+    }
+    .guide-form input[type="email"]{width:100%;padding:16px;border:1px solid #e6eef8;border-radius:10px;margin-bottom:16px;font-size:1rem}
+    .guide-form button{width:100%;padding:16px;border-radius:10px;border:none;background:linear-gradient(90deg,var(--primary),#333);color:white;font-weight:700;cursor:pointer;transition:transform .14s ease}
+    .guide-form button:hover{transform:translateY(-3px)}
+    .form-message{margin-top:10px;font-size:0.95rem;color:var(--muted)}
+
+    /* ===== ABOUT SECTION ===== */
+    .about{padding:80px 0;background:var(--bg)}
+    .about-content{display:grid;gap:28px;grid-template-columns:1fr}
+    @media(min-width:768px){.about-content{grid-template-columns:1fr 1fr}}
+    .creator-photo{width:70px;height:70px;border-radius:12px;background:url('YOUR_DALLE_ABOUT_URL') center/cover no-repeat;color:white;display:flex;align-items:center;justify-content:center}
+
+    /* ===== FAQ SECTION ===== */
+    .faq{padding:80px 0}
+    .faq-item{border-radius:12px;overflow:hidden;border:1px solid rgba(2,6,23,0.04);margin-bottom:12px}
+    .faq-question{display:flex;justify-content:space-between;padding:16px;background:var(--card);cursor:pointer;font-weight:700}
+    .faq-answer{padding:0 16px;max-height:0;overflow:hidden;transition:max-height .28s ease}
+    .faq-answer.show{padding:14px 16px;max-height:400px}
+
+    /* ===== WAITLIST SECTION ===== */
+    .waitlist{padding:80px 0;background:linear-gradient(135deg,var(--accent),#059669);color:white}
+    .waitlist-form{background:rgba(255,255,255,0.06);padding:22px;border-radius:12px;backdrop-filter:blur(6px)}
+    .waitlist-form input[type="email"]{width:100%;padding:16px;border-radius:10px;border:none;margin-bottom:16px}
+    .waitlist-form button{width:100%;padding:16px;border-radius:10px;border:none;background:white;color:var(--primary);font-weight:700;cursor:pointer}
+    .waitlist-form .form-message{margin-top:10px;color:inherit}
+
+    /* ===== FOOTER ===== */
+    footer{background:#08102a;color:#cbd5e1;padding:60px 0}
+    .footer-content{display:grid;gap:20px}
+    @media(min-width:768px){.footer-content{grid-template-columns:1fr 1fr 1fr}}
+    .social-icon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:8px;background:#0b1a3b;color:white;text-decoration:none;margin-right:8px}
+
+    /* visually hidden for honeypot */
+    .visually-hidden{position:absolute!important;height:1px;width:1px;overflow:hidden;clip:rect(1px,1px,1px,1px);white-space:nowrap;border:0;padding:0;margin:-1px}
+
+    /* ===== RESPONSIVE DESIGN (Pour Mobile) ===== */
+    @media(max-width:992px){
+      .solution-grid{
+        grid-template-columns: repeat(2, 1fr); /* 2 cards per row on tablet */
+      }
+    }
+
+    @media(max-width:768px){
+      .hero-content{
+        grid-template-columns: 1fr; /* Stack text and button */
+        text-align:center;
+        gap: 30px;
+      }
+      .hero-subtitle{
+        max-width:100%;
+      }
+      .cta-large{
+        justify-self: center; /* Center button on mobile */
+      }
+      .problem-stats,
+      .solution-grid{
+        grid-template-columns: 1fr; /* 1 card per line */
+      }
+      .platform-logos{
+        justify-content:center;
+      }
+    }
+
+    @media(max-width:600px){
+      .hero{padding:120px 18px 60px}
+      .hero h1{font-size:2.2rem}
+      .hero-subtitle {font-size: 1.1rem;}
+    }
+
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container">
+      <div class="header-content">
+        <a class="logo" href="#">
+          <img class="logo-img" src="https://i.ibb.co/CKtf1C4Q/logo.png" alt="FactureBot logo">
+          <span class="logo-text">FactureBot</span>
+        </a>
+
+        <nav aria-label="Primary">
+          <ul class="nav-links">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#guide">Free Guide</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#waitlist" class="cta-large" style="padding:10px 18px;font-size:0.95rem">Early Access</a></li>
+          </ul>
+        </nav>
+
+        <button class="mobile-menu-btn" aria-expanded="false" aria-controls="primary-nav" aria-label="Toggle menu">
+          <i class="fas fa-bars"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero" aria-label="Intro">
+    <div class="container">
+      <div class="hero-content">
+        <div>
+          <h1>Stop Chasing Unpaid Invoices</h1>
+          <p class="hero-subtitle">Automated reminders that save freelancers 3+ hours monthly. Get paid faster without awkward conversations.</p>
+        </div>
+        <div>
+          <a class="cta-large" href="#guide">Get Your Free Guide <i class="fas fa-arrow-right" style="opacity:0.9"></i></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOCIAL PROOF -->
+  <section class="social-proof">
+    <div class="container">
+      <p style="color:var(--muted);margin-bottom:16px; text-align: center;">Trusted by freelancers from:</p>
+      <div class="platform-logos">
+        <div class="platform-logo">Upwork</div>
+        <div class="platform-logo">Fiverr</div>
+        <div class="platform-logo">Malt</div>
+        <div class="platform-logo">Freelance.com</div>
+        <div class="platform-logo">Toptal</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM -->
+  <section class="problem" id="features">
+    <div class="container">
+      <h2 class="section-title">❌ Wasting 3+ Hours Monthly on Manual Follow-ups?</h2>
+      <p class="problem-text">The hidden cost of chasing payments includes lost time, unnecessary stress, and delayed revenue.</p>
+
+      <div class="problem-stats">
+        <div class="stat-card">
+          <div class="stat-icon">⏰</div>
+          <div class="stat-number">2.5 Hours</div>
+          <div class="stat-desc">Average time spent monthly on invoice follow-ups</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-number">$2,400</div>
+          <div class="stat-desc">Annual revenue delayed due to late payments</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">😫</div>
+          <div class="stat-number">72%</div>
+          <div class="stat-desc">Of freelancers report stress from chasing payments</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SOLUTION -->
+  <section class="solution">
+    <div class="container">
+      <div style="text-align:center">
+        <h2 class="section-title">✅ FactureBot Solves This</h2>
+      </div>
+
+      <div class="solution-grid">
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-robot"></i></div>
+          <h3 class="feature-title">Automated Reminders</h3>
+          <p class="feature-desc">Set it and forget it. Polite, professional reminders sent automatically.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+          <h3 class="feature-title">5-Minute Setup</h3>
+          <p class="feature-desc">Connect your invoicing tool or upload manually. Ready in minutes.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+          <h3 class="feature-title">70% Faster Payments</h3>
+          <p class="feature-desc">Clients respond to automated reminders. Get paid weeks earlier.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+          <h3 class="feature-title">Professional Templates</h3>
+          <p class="feature-desc">Maintain your brand voice while getting paid. Customizable templates.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- GUIDE OFFER -->
+  <section id="guide" class="guide-offer" aria-label="Free Guide">
+    <div class="container">
+      <div class="guide-content">
+        <div class="guide-badge">FREE DOWNLOAD</div>
+        <h2 class="section-title" style="color:white;margin-top:8px">Get Our Free Guide</h2>
+        <p style="font-size:1.05rem;opacity:0.95;color:rgba(255,255,255,0.9);margin-bottom:16px">"7 Invoice Mistakes Costing Freelancers 3+ Hours Monthly (And How To Fix Them)"</p>
+
+        <div class="guide-form" aria-live="polite">
+          <h3 style="margin-bottom:12px;color:var(--dark)">Download Your Free Guide</h3>
+
+          <form id="guideForm" novalidate>
+            <label class="visually-hidden" for="guide-email">Your professional email</label>
+            <input id="guide-email" type="email" name="email" placeholder="Your professional email" required aria-required="true" />
+            <!-- honeypot -->
+            <input type="text" name="hp" class="visually-hidden" tabindex="-1" autocomplete="off" />
+
+            <button type="submit"><i class="fas fa-download"></i> Download Free Guide</button>
+
+            <p id="guideMessage" class="form-message" role="status" aria-live="polite"></p>
+
+            <p style="color:var(--muted);font-size:0.9rem;margin-top:12px">
+              <i class="fas fa-lock"></i> No spam. You'll also join our waitlist.
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section id="about" class="about">
+    <div class="container">
+      <h2 class="section-title" style="text-align:center;margin-bottom:18px">About FactureBot</h2>
+
+      <div class="about-content">
+        <div>
+          <h3 style="font-size:1.25rem;margin-bottom:12px">Built by a Freelancer, for Freelancers</h3>
+          <p style="color:var(--muted);margin-bottom:10px">After spending countless hours chasing unpaid invoices and feeling the stress of delayed payments, I knew there had to be a better way. Most invoicing tools are either too complex or too expensive for solo freelancers and small agencies.</p>
+          <p style="color:var(--muted);margin-bottom:16px">FactureBot was born from this frustration. Our mission is simple: help freelancers get paid faster without the awkward conversations and time-consuming follow-ups.</p>
+
+          <div style="display:flex;align-items:center;gap:14px;margin-top:14px">
+            <div class="creator-photo" aria-hidden="true"></div>
+            <div>
+              <h4 style="margin:0">L. Smith Johnson</h4>
+              <p style="color:var(--muted);margin:0">Founder & Freelancer</p>
+            </div>
+          </div>
+        </div>
+
+        <div style="background:white;padding:18px;border-radius:12px;box-shadow:0 8px 22px rgba(2,6,23,0.04)">
+          <h3 style="color:var(--dark)">Our Vision</h3>
+          <p style="color:var(--muted);margin-top:8px">To eliminate the stress of invoice management for 1 million freelancers worldwide, giving them back their time to focus on what they do best.</p>
+          <div style="margin-top:18px">
+            <a class="social-icon" href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a class="social-icon" href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+            <a class="social-icon" href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="faq">
+    <div class="container">
+      <h2 class="section-title" style="text-align:center;margin-bottom:18px">Frequently Asked Questions</h2>
+
+      <div class="faq-container">
+        <div class="faq-item">
+          <div class="faq-question">Is FactureBot really free? <i class="fas fa-chevron-down"></i></div>
+          <div class="faq-answer"><p style="color:var(--muted);margin:0 0 12px">Yes! The first 50 users get lifetime free access to all core features... (etc)</p></div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">How does it work? <i class="fas fa-chevron-down"></i></div>
+          <div class="faq-answer"><p style="color:var(--muted);margin:0">1. Connect your invoicing tool... (etc)</p></div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">When will you launch? <i class="fas fa-chevron-down"></i></div>
+          <div class="faq-answer"><p style="color:var(--muted);margin:0">We're aiming for a beta launch in Q2 2024...</p></div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-question">Is my data secure? <i class="fas fa-chevron-down"></i></div>
+          <div class="faq-answer"><p style="color:var(--muted);margin:0">Absolutely. We use bank-level encryption...</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WAITLIST -->
+  <section id="waitlist" class="waitlist">
+    <div class="container">
+      <div style="max-width:700px;margin:0 auto;text-align:center">
+        <h2 class="section-title" style="color:white;margin-bottom:8px">Join Our Exclusive Waitlist</h2>
+        <p style="color:rgba(255,255,255,0.9);margin-bottom:18px">Limited lifetime free access for early adopters</p>
+
+        <div class="waitlist-form" aria-live="polite">
+          <form id="waitlistForm" novalidate>
+            <label class="visually-hidden" for="waitlist-email">Email</label>
+            <input id="waitlist-email" type="email" name="email" placeholder="Your professional email" required aria-required="true" />
+            <input type="text" name="hp" class="visually-hidden" tabindex="-1" autocomplete="off" />
+            <button type="submit"><i class="fas fa-rocket"></i> Join Waitlist (Free)</button>
+            <p id="waitlistMessage" class="form-message" role="status" aria-live="polite"></p>
+            <p style="opacity:.85;margin-top:12px;color:rgba(255,255,255,0.95)"><i class="fas fa-shield-alt"></i> No credit card required. Unsubscribe anytime.</p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="container">
+      <div class="footer-content">
+        <div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+            <img src="https://i.ibb.co/CKtf1C4Q/logo.png" alt="logo" style="height:36px">
+            <strong style="font-size:16px">FactureBot</strong>
+          </div>
+          <p style="color:#9fb0c9">Automated invoice reminders for modern freelancers and agencies.</p>
+          <div style="margin-top:12px">
+            <a class="social-icon" href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            <a class="social-icon" href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+          </div>
+        </div>
+
+        <div>
+          <h4>Quick Links</h4>
+          <ul style="list-style:none;padding:0;margin-top:8px">
+            <li><a href="#features" style="color:#cbd5e1;text-decoration:none">Features</a></li>
+            <li><a href="#guide" style="color:#cbd5e1;text-decoration:none">Free Guide</a></li>
+            <li><a href="#about" style="color:#cbd5e1;text-decoration:none">About</a></li>
+            <li><a href="#faq" style="color:#cbd5e1;text-decoration:none">FAQ</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4>Contact</h4>
+          <p style="color:#9fb0c9;margin-top:8px">Have questions? We're here to help.</p>
+          <a href="mailto: globalagencycraf@gmail.com" style="color:#cbd5e1;text-decoration:none"><i class="fas fa-envelope"></i> info.facturebot@gmail.com</a>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:28px;color:#8fabc7;font-size:0.9rem">
+        <div>© 2024 FactureBot. All rights reserved. | <a href="#" style="color:#8fabc7">Privacy Policy</a></div>
+        <div style="margin-top:6px">Made with <i class="fas fa-heart" style="color:#ff6b6b"></i> for freelancers worldwide</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JS -->
+  <script>
+    (function(){
+      // Config
+      const FORMSPREE_ENDPOINT = 'https://formspree.io/f/xldqnzjv';
+      const GUIDE_DOWNLOAD = 'https://drive.google.com/uc?export=download&id=14PsfbzfbBlmhPiqTQI2PV462aQUe8hZp';
+
+      // DOM ready
+      document.addEventListener('DOMContentLoaded', function() {
+
+        // ===== MOBILE NAVIGATION CORRECTED =====
+        const mobileBtn = document.querySelector('.mobile-menu-btn');
+        mobileBtn && mobileBtn.addEventListener('click', function(){
+          const nav = document.querySelector('nav');
+          if(!nav) return;
+          nav.classList.toggle('show');
+          this.setAttribute('aria-expanded', nav.classList.contains('show').toString());
+          
+          // Change l'icône du burger
+          const icon = this.querySelector('i');
+          if(icon) {
+            if(nav.classList.contains('show')) {
+              icon.classList.remove('fa-bars');
+              icon.classList.add('fa-times');
+            } else {
+              icon.classList.remove('fa-times');
+              icon.classList.add('fa-bars');
+            }
+          }
+        });
+
+        // Fermer le menu quand on clique sur un lien
+        document.querySelectorAll('.nav-links a').forEach(link => {
+          link.addEventListener('click', () => {
+            const nav = document.querySelector('nav');
+            if(nav) nav.classList.remove('show');
+            const btn = document.querySelector('.mobile-menu-btn');
+            if(btn) {
+              btn.setAttribute('aria-expanded', 'false');
+              const icon = btn.querySelector('i');
+              if(icon) {
+                icon.classList.remove('fa-times');
+                icon.classList.add('fa-bars');
+              }
+            }
+          });
+        });
+
+        // FAQ toggle
+        document.querySelectorAll('.faq-question').forEach(q=>{
+          q.addEventListener('click', function(){
+            const ans = this.nextElementSibling;
+            if(!ans) return;
+            ans.classList.toggle('show');
+            // rotate icon
+            const icon = this.querySelector('i');
+            if(icon) icon.style.transform = ans.classList.contains('show') ? 'rotate(180deg)' : 'rotate(0)';
+            // close others
+            document.querySelectorAll('.faq-answer').forEach(o=>{
+              if(o!==ans && o.classList.contains('show')) { o.classList.remove('show'); const p = o.previousElementSibling; if(p) { const i = p.querySelector('i'); if(i) i.style.transform='rotate(0)'; } }
+            });
+          });
+        });
+
+        // Smooth scroll for anchors
+        document.querySelectorAll('a[href^="#"]').forEach(a=>{
+          a.addEventListener('click', function(e){
+            const target = this.getAttribute('href');
+            if(!target || target === '#') return;
+            const el = document.querySelector(target);
+            if(!el) return;
+            e.preventDefault();
+            window.scrollTo({ top: el.offsetTop - 80, behavior:'smooth' });
+          });
+        });
+
+        // Helper: show message
+        function setMessage(el, text, color){
+          if(!el) return;
+          el.textContent = text;
+          if(color) el.style.color = color;
+        }
+
+        // Waitlist form AJAX
+        const waitlistForm = document.getElementById('waitlistForm');
+        if(waitlistForm){
+          const btn = waitlistForm.querySelector('button[type="submit"]');
+          const msg = document.getElementById('waitlistMessage');
+          waitlistForm.addEventListener('submit', async function(e){
+            e.preventDefault();
+            const email = this.querySelector('input[name="email"]');
+            const hp = this.querySelector('input[name="hp"]');
+            if(hp && hp.value){ setMessage(msg,'Bot detected.', '#ffb3b3'); return; }
+            if(!email || !email.value){ setMessage(msg,'Please enter your email.','#ffb3b3'); return; }
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...'; btn.disabled = true; setMessage(msg,'','');
+            try {
+              await fetch(FORMSPREE_ENDPOINT, {
+                method:'POST',
+                headers:{ 'Content-Type':'application/json' },
+                body: JSON.stringify({ email: email.value, _subject: 'New FactureBot Waitlist Signup' })
+              });
+              setMessage(msg,'✅ Thank you — you are on the waitlist.', 'white');
+              this.reset();
+            } catch(err){
+              console.error('Waitlist error',err);
+              setMessage(msg,'Something went wrong. Please try later.','#ffb3b3');
+            } finally {
+              btn.innerHTML = orig; btn.disabled = false;
+            }
+          });
+        }
+
+        // Guide form AJAX -> capture email -> start download
+        const guideForm = document.getElementById('guideForm');
+        if(guideForm){
+          const btn = guideForm.querySelector('button[type="submit"]');
+          const msg = document.getElementById('guideMessage');
+          guideForm.addEventListener('submit', async function(e){
+            e.preventDefault();
+            const email = this.querySelector('input[name="email"]');
+            const hp = this.querySelector('input[name="hp"]');
+            if(hp && hp.value){ setMessage(msg,'Bot detected.','#ffb3b3'); return; }
+            if(!email || !email.value){ setMessage(msg,'Please enter a valid email.','#ffb3b3'); return; }
+            const orig = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Preparing...'; btn.disabled = true; setMessage(msg,'','');
+
+            try {
+              // capture email (same Formspree endpoint)
+              await fetch(FORMSPREE_ENDPOINT, {
+                method:'POST',
+                headers:{ 'Content-Type':'application/json' },
+                body: JSON.stringify({ email: email.value, _subject: 'FactureBot Free Guide Request' })
+              });
+              setMessage(msg,'✅ Your download will start. If not, use the link below.','#094bde');
+
+              // small delay to display message then open download
+              setTimeout(()=>{ window.open(GUIDE_DOWNLOAD, '_blank', 'noopener'); }, 650);
+              this.reset();
+            } catch(err){
+              console.error('Guide submission error',err);
+              setMessage(msg,'Could not start download. Try again later.','#ffb3b3');
+            } finally {
+              btn.innerHTML = orig; btn.disabled = false;
+            }
+          });
+        }
+
+        // Accessibility: show focus outlines for keyboard users
+        function handleFirstTab(e){
+          if(e.key === 'Tab'){ document.documentElement.classList.add('user-is-tabbing'); window.removeEventListener('keydown', handleFirstTab); }
+        }
+        window.addEventListener('keydown', handleFirstTab);
+
+      }); // DOMContentLoaded end
+    })();
+  </script>
+</body>
+</html>
